@@ -8,7 +8,7 @@ def modify_xyz(file):
 		data[i][0] = int(data[i][0]) / 10
 		data[i][1] = int(data[i][1]) / 10
 		data[i][2] = int(data[i][2]) / 10
-	np.savetxt(file, data, delimiter=',', fmt="%i %i %i %s %s", header="X, Y, Z, ID, Description", comments="")
+	np.savetxt(file, data, delimiter=',', fmt="%i, %i, %i, %s, %s", header="X, Y, Z, ID, Description", comments="")
 
 def modify_csv_format(file):
 	file_out = file[:file.find(".csv")] + "_mod.csv"
