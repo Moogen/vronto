@@ -2,6 +2,8 @@
 namespace VRTK.GrabAttachMechanics
 {
     using UnityEngine;
+    using VRTK;
+    
 
     /// <summary>
     /// The Track Object Grab Attach script doesn't attach the object to the controller via a joint, instead it ensures the object tracks the direction of the controller.
@@ -25,6 +27,7 @@ namespace VRTK.GrabAttachMechanics
         public float angularVelocityLimit = float.PositiveInfinity;
 
         protected bool isReleasable = true;
+
 
         /// <summary>
         /// The StopGrab method ends the grab of the current object and cleans up the state.
@@ -108,6 +111,7 @@ namespace VRTK.GrabAttachMechanics
                     grabbedObjectRigidBody.angularVelocity = calculatedAngularVelocity;
                 }
             }
+            
 
             Vector3 velocityTarget = positionDelta / Time.fixedDeltaTime;
             Vector3 calculatedVelocity = Vector3.MoveTowards(grabbedObjectRigidBody.velocity, velocityTarget, maxDistanceDelta);
@@ -115,7 +119,29 @@ namespace VRTK.GrabAttachMechanics
             if (velocityLimit == float.PositiveInfinity || calculatedVelocity.sqrMagnitude < velocityLimit)
             {
                 grabbedObjectRigidBody.velocity = calculatedVelocity;
+
+                //modified script
+                GameObject rightController = GameObject.FindGameObjectWithTag("RightController");
+                VRTK_ControllerEvents controllerEvents = rightController.GetComponent<VRTK_ControllerEvents>();
+
+                if(controllerEvents.IsButtonPressed(VRTK_ControllerEvents.ButtonAlias.TouchpadTouch)){
+                    Vector2 direction = controllerEvents.GetTouchpadAxis();
+
+                    //move forward/backward along touchpad y axis
+                    trackPoint.position += rightController.transform.forward * direction.y * 0.05f;
+                    Vector3 forwardPositionDelta = trackPoint.position - (grabbedSnapHandle != null ? grabbedSnapHandle.position : grabbedObject.transform.position);
+                    Vector3 forwardVel = forwardPositionDelta / Time.fixedDeltaTime;
+                    grabbedObjectRigidBody.velocity = forwardVel;
+
+                }
+
+                
+
+
             }
+
+            
+
         }
 
         protected override void Initialise()
